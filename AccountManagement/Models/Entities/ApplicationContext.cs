@@ -14,6 +14,7 @@ public class ApplicationContext : DbContext
 
     public DbSet<Account> Account { get; set; }
 
+    public DbSet<Transaction?> Transaction { get; set; }
     public DbSet<RefreshToken> RefreshToken { get; set; }
 
     public DbSet<Currency> Currency { get; set; }
@@ -76,6 +77,29 @@ public class ApplicationContext : DbContext
                 .HasColumnName("is_deleted");
         });
 
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.ToTable("transaction");
+            entity.Property(e => e.Id)
+                .HasColumnName("id");
+            entity.Property(e => e.Type)
+                .HasColumnName("type");
+            entity.Property(e => e.Balance)
+                .HasColumnName("balance");
+            entity.Property(e => e.AccountId)
+                .HasColumnName("account_id");
+            entity.Property(e => e.Amount)
+                .HasColumnName("amount");
+            entity.Property(e=>e.Created)
+                .HasColumnName("created");
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+            entity.Property(e => e.ToAccountId)
+                .HasColumnName("to_account_id");
+            entity.Property(e => e.IsDeleted)
+                .HasColumnName("is_deleted");
+        });
+        
         modelBuilder.Entity<Currency>(entity =>
         {
             entity.ToTable("currency");

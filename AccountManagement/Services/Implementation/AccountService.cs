@@ -1,4 +1,5 @@
-﻿using AccountManagement.Models.Entities;
+﻿using AccountManagement.Models.Common;
+using AccountManagement.Models.Entities;
 using AccountManagement.Models.Requests;
 using AccountManagement.Repositories.Abstraction;
 using AccountManagement.Services.Abstraction;
@@ -9,12 +10,14 @@ public class AccountService: IAccountService
 {
     
     private readonly IAccountRepo _accountRepo;
+    private readonly ITransactionRepo _transactionRepo;
     private readonly Serilog.ILogger _logger;
 
-    public AccountService(IAccountRepo accountRepo, Serilog.ILogger logger)
+    public AccountService(IAccountRepo accountRepo, Serilog.ILogger logger, ITransactionRepo transactionRepo)
     {
         _accountRepo = accountRepo;
         _logger = logger;
+        _transactionRepo = transactionRepo;
     }
 
     public async Task<string> CreateAccount(CreateAccountRequest request)
@@ -93,6 +96,16 @@ public class AccountService: IAccountService
         }
         
         await _accountRepo.UpdateAccount(account);
+
+        var transaction = new Transaction
+        {
+            Type = (int) TransactionType.Debit,
+            AccountId = account.Id,
+            Amount = request.Amount,
+            Balance = account.Balance,
+            Created = DateTime.Now.ToUniversalTime(),
+        };
+        await _transactionRepo.Write(transaction);
     }
     
     public async Task SubtractBalance(BalanceRequest request)
@@ -118,6 +131,16 @@ public class AccountService: IAccountService
         }
         
         await _accountRepo.UpdateAccount(account);
+        
+        var transaction = new Transaction
+        {
+            Type = (int) TransactionType.Credit,
+            AccountId = account.Id,
+            Amount = request.Amount,
+            Balance = account.Balance,
+            Created = DateTime.Now.ToUniversalTime(),
+        };
+        await _transactionRepo.Write(transaction);
     }
     
     public async Task TransferBalance(TransferBalanceRequest request)
@@ -174,5 +197,16 @@ public class AccountService: IAccountService
         
         await _accountRepo.UpdateAccount(fromAccount);
         await _accountRepo.UpdateAccount(toAccount);
+        
+        var transaction = new Transaction
+        {
+            Type = (int) TransactionType.Transfer,
+            AccountId = fromAccount.Id,
+            Amount = request.Amount,
+            Balance = fromAccount.Balance,
+            Created = DateTime.Now.ToUniversalTime(),
+            ToAccountId = toAccount.Id
+        };
+        await _transactionRepo.Write(transaction);
     }
 }

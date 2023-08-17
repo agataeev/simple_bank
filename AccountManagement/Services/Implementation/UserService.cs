@@ -1,5 +1,4 @@
-﻿using AccountManagement.Managers.Abstraction;
-using AccountManagement.Models.Entities;
+﻿using AccountManagement.Models.Entities;
 using AccountManagement.Repositories.Abstraction;
 using AccountManagement.Services.Abstraction;
 

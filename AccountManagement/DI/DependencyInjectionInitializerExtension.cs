@@ -20,6 +20,7 @@ public static class DependencyInjectionInitializerExtension
         services.AddTransient<IUserRepo, UserRepo>();
         services.AddTransient<IAccountRepo, AccountRepo>();
         services.AddTransient<IRefreshTokenRepo, RefreshTokenRepo>();
+        services.AddTransient<ITransactionRepo, TransactionRepo>();
         
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IAccountService, AccountService>();
